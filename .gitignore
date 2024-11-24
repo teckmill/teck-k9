@@ -1,0 +1,20 @@
+# FiveM specific
+cache/
+*.dll
+*.exe
+*.log
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# IDE specific
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Temp files
+*.tmp
+*.bak
+*.swp
