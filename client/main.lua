@@ -1,9 +1,9 @@
 local QBCore = exports['qb-core']:GetCoreObject()
-local K9 = nil
-local isK9Out = false
-local following = false
-local searching = false
-local attacking = false
+K9 = nil
+isK9Out = false
+following = false
+searching = false
+attacking = false
 
 -- Initialize K9 Handler
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
@@ -13,8 +13,11 @@ RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
 end)
 
 -- Spawn K9
-local function SpawnK9()
-    if isK9Out then return end
+function SpawnK9()
+    if isK9Out then 
+        QBCore.Functions.Notify('K9 is already spawned', 'error')
+        return 
+    end
     
     local model = Config.K9Model
     RequestModel(model)
@@ -34,6 +37,8 @@ local function SpawnK9()
     
     isK9Out = true
     following = true
+    
+    QBCore.Functions.Notify('K9 unit spawned', 'success')
     
     -- Start following behavior
     CreateThread(function()
@@ -70,11 +75,15 @@ RegisterCommand(Config.CommandName, function(source, args)
     elseif command == 'dismiss' and isK9Out then
         DeleteEntity(K9)
         isK9Out = false
+        QBCore.Functions.Notify('K9 unit dismissed', 'success')
     elseif command == 'attack' and isK9Out then
         local closestPlayer = GetClosestPlayer()
         if closestPlayer then
             attacking = true
             TaskCombatPed(K9, GetPlayerPed(closestPlayer), 0, 16)
+            QBCore.Functions.Notify('K9 is attacking target', 'success')
+        else
+            QBCore.Functions.Notify('No target found', 'error')
         end
     elseif command == 'search' and isK9Out then
         local vehicle = GetClosestVehicle()
@@ -84,16 +93,20 @@ RegisterCommand(Config.CommandName, function(source, args)
             Wait(Config.SearchTime)
             TriggerServerEvent('teck-k9:server:SearchVehicle', VehToNet(vehicle))
             searching = false
+        else
+            QBCore.Functions.Notify('No vehicle found nearby', 'error')
         end
     elseif command == 'follow' and isK9Out then
         following = true
         attacking = false
         ClearPedTasks(K9)
+        QBCore.Functions.Notify('K9 is following', 'success')
     elseif command == 'stay' and isK9Out then
         following = false
         attacking = false
         ClearPedTasks(K9)
         PlayAnimation('sit')
+        QBCore.Functions.Notify('K9 is staying', 'success')
     end
 end)
 
